@@ -22,6 +22,7 @@ The resulting `report.xlsx` lists each reference with:
 - the amount recorded by your practice
 - a `difference` column (bank minus practice)
 - a `status` column indicating if payments match or which file is missing the entry
+Amounts are considered a match if their difference is within a small tolerance (default `0.01`).
 
 ### Column Options
 
@@ -30,7 +31,10 @@ Specify the column names for each file individually:
 ```bash
 python reconcile.py bank.xlsx practice.xlsx report.xlsx \
   --bank-reference BankRef --practice-reference InvoiceID \
-  --bank-amount Received --practice-amount Paid
+  --bank-amount Received --practice-amount Paid \
+  --tolerance 0.05
+
+Use `--tolerance` to change how close amounts must be to count as a match.
 ```
 
 ### Requirements

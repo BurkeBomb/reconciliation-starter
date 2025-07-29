@@ -22,6 +22,7 @@ def reconcile(
     practice_ref: str = "Reference",
     bank_amount: str = "Amount",
     practice_amount: str = "Amount",
+    tolerance: float = 0.01,
 ) -> pd.DataFrame:
     """Return a reconciliation DataFrame merging bank and practice by reference."""
     bank_df = bank_df.copy()
@@ -47,7 +48,7 @@ def reconcile(
 
     def status(row):
         if row["_merge"] == "both":
-            if row["difference"] == 0:
+            if abs(row["difference"]) <= tolerance:
                 return "matched"
             else:
                 return "amount_mismatch"
@@ -76,6 +77,12 @@ def main():
                         help="Amount column in the bank file")
     parser.add_argument("--practice-amount", default="Amount",
                         help="Amount column in the practice file")
+    parser.add_argument(
+        "--tolerance",
+        type=float,
+        default=0.01,
+        help="Allowed difference between amounts to still consider them a match",
+    )
     args = parser.parse_args()
 
     bank_df = load_excel(args.bank)
@@ -88,6 +95,7 @@ def main():
         practice_ref=args.practice_reference,
         bank_amount=args.bank_amount,
         practice_amount=args.practice_amount,
+        tolerance=args.tolerance,
     )
     result.to_excel(args.output, index=False)
     print(f"Reconciliation written to {args.output}")
